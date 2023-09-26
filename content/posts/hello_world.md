@@ -9,6 +9,6 @@ tags = [
 
 ## Hello world from patrickpichler.dev
 
-I am planning to write about different kuberentes/cloud/container related topics.
+I am planning to write about different kubernetes/cloud/container related topics.
 
 So stay tuned!
