@@ -31,12 +31,18 @@ languages:
         - name: Posts
           url: posts
           weight: 5
+        - name: Talks
+          url: talks
+          weight: 8
         - name: Search
           url: search/
           weight: 10
         - name: Tags
           url: tags/
-          weight: 10
+          weight: 15
+        - name: Archive
+          url: archives/
+          weight: 20
 
 outputs:
   home:
@@ -79,6 +85,8 @@ params:
       url: "https://github.com/patrickpichler"
     - name: LinkedIn
       url: "https://www.linkedin.com/in/patrick-pichler-741a5a241/"
+    - name: CV
+      url: "assets/PatrickPichler.pdf"
 
   # label:
   # iconSVG: ''
