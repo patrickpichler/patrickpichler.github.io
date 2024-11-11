@@ -1,5 +1,4 @@
 +++
-draft = true
 author = "Patrick Pichler"
 title = "Figuring out which helpers are available in what kernel version in eBPF"
 date = "2024-11-10"
@@ -16,23 +15,24 @@ at Linux Kernel version n".
 
 ## docs.ebpf.io
 
-One pretty amazing resource for anything eBPF related is https://https://docs.ebpf.io.
-It was started by [Dylan Reimerink](https://github.com/dylandreimerink) (as far as
-I can tell).
+One pretty amazing resource for anything eBPF related is [docs.ebpf.io](https://docs.ebpf.io).
+It was started by [Dylan Reimerink](https://github.com/dylandreimerink) (as far as I can tell).
 
-<!-- TODO(patrick.pichler): insert screenshot of docs.ebpf.io -->
+{{< img "ebpf_docs.png" "eBPF docs landing page" >}}
 
 Not only does it contain documentation for most eBPF helpers,program types and
 maps, but also includes a kernel version it was introduced in. Take for example
 the `bpf_sk_storage_get` helper. The documentation for it can be found under
 [linux/helper-function/bpf_spin_lock/](https://docs.ebpf.io/linux/helper-function/bpf_sk_storage_get/).
 
-<!-- TODO(patrick.pichler): insert screenshot of bpf_spin_lock page -->
+{{< img "ebpf_docs_spin_lock.png" "eBPF docs page about bpf_spin_lock" >}}
 
 The first thing you see on the page is the version it was introduced, in this case it was
 `v5.2`. There is also quick overview what the helper does, as well as how to use it. You will also
 find a list of program types the helper is available in, which is exactly what we were searching
 for.
+
+{{< img "ebpf_docs_spin_lock_program_types.png" "eBPF docs page about bpf_spin_lock" >}}
 
 Sadly, this list of program types can be a bit misleading. In the example before with the
 `bpf_sk_storage_get` helper, you can see that it was introduced in `v5.2` and
@@ -44,12 +44,11 @@ checking out.
 
 ## bpftool
 
-If you are writing eBPF programs, you probably heard about `bpftool` before. In case you do not know
-it, `bpftool` is part of the `libbpf` project and offers various utilities, such as listing all eBPF
-programs and maps currently loaded, to dumping the content of specific maps and even dumping the BTF
-for a given binary. It is a pretty powerful and incredibly useful tool to know how to use.
-
-<!-- TODO(patrick.pichler): insert screenshot of output from bpftool -->
+If you are writing eBPF programs, you probably heard about
+[bpftool](https://github.com/libbpf/bpftool) before. In case you do not know it, `bpftool` is part
+of the `libbpf` project and offers various utilities, such as listing all eBPF programs and maps
+currently loaded, to dumping the content of specific maps and even dumping the BTF for a given
+binary. It is a pretty powerful and incredibly useful tool to know how to use.
 
 One feature that I only learned recently, is the `bpftool feature probe kernel` command. The output
 of this subcommand is a list of all supported program types/map types and helpers by program type.
@@ -59,6 +58,8 @@ current kernel version, all we need to do is run `bpftool feature probe kernel |
 `eBPF helpers supported for program type syscall` and go through the list of helpers it lists. If
 `bpf_spin_lock` is there, it means it is supported on the current kernel version, if not, it is not
 supported.
+
+{{< img "bpftool.png" "bpftool in action" >}}
 
 The `bpftool` method does have a few downsides though. One of the most obvious is, that it will
 only show the available helpers/program types for the current kernel version. There is simply no
@@ -88,7 +89,7 @@ We first start by navigating to the
 file for our target kernel version on Bootlin. It contains definitions for all the program types
 supported in that version of the Linux Kernel.
 
-<!-- TODO(patrick.pichler): insert screenshot include/linux/bpf_types.h -->
+{{< img "bootlin_bpf_types.png" "include/linux/bpf_types.h file in Linux 5.10" >}}
 
 The verifier also uses this file to map each program
 type to some verifier options, based on some macro definitions we can find
@@ -98,22 +99,22 @@ verifier ops and have a look at the `get_func_proto` function pointer. The verif
 specific naming pattern. It will just take the second argument passed to `BPF_PROG_TYPE` and append
 `_verifier_ops` (as seen in the verifier macro definition).
 
-<!-- TODO(patrick.pichler): insert screenshot verifier macro -->
+{{< img "bootlin_verifier_prog_type_macro.png" "Macro used by verifier to locate program types ops" >}}
 
 In our case, we want to figure out if `bpf_spin_lock` is
 available for program type `BPF_PROG_TYPE_TRACING`. In
 [include/linux/bpf_types.h](https://elixir.bootlin.com/linux/v5.10/source/include/linux/bpf_types.h#L49),
 the second argument passed to the definition is `tracing`. This means the verifier ops we are
-searching for is called `tracing_verifier_opts`. We can enter this in the search box on the upper
+searching for is called `tracing_verifier_ops`. We can enter this in the search box on the upper
 right with the placeholder text `Search Identifier`. There should be only a single result.
 
-<!-- TODO(patrick.pichler): insert screenshot of definition of tracing_verifier_opts -->
+{{< img "bootlin_tracing_verifier_ops.png" "Definition of tracing_verifier_ops" >}}
 
 Now, let's trace assigned value of `get_func_proto`, `tracing_prog_func_proto`. We can do this,
 by clicking on `tracing_prog_func_proto` and select the location under `Defined in 1 files as
 function`.
 
-<!-- TODO(patrick.pichler): insert screenshot of tracing_prog_func_proto -->
+{{< img "bootlin_tracing_prog_func_proto.png" "tracing_prog_func_proto function" >}}
 
 The way `tracing_prog_func_proto` works is pretty straight forward. In the end it is a series of
 some switch statements, that will either match the requested helper `bpf_func_id` and returns a
