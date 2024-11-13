@@ -34,13 +34,16 @@ for.
 
 {{< img "ebpf_docs_spin_lock_program_types.png" "eBPF docs page about bpf_spin_lock" >}}
 
-Sadly, this list of program types can be a bit misleading. In the example before with the
-`bpf_sk_storage_get` helper, you can see that it was introduced in `v5.2` and
-`BPF_PROG_TYPE_TRACING` is listed as program types it is available in. The problem is, that the
-helper only started to be available in version `v5.11` for that program type.
+One word of caution though. All the docs on the website are manually created, meaning that there
+can be mistakes, as well as just missing data. When a helper is only later than its introduction
+available to a certain program type, you will find a small label next to the program type with the
+starting version it was introduced.
 
-Besides this small gotcha, docs.ebpf.io is an invaluable resource, that is definitely worth
-checking out.
+{{< img "ebpf_docs_bpf_sk_storage_get_program_types.png" "There are small labels with the version support was introduced" >}}
+
+In case you notice any missing data or error on the page, I would suggest you head over to the docs
+[GitHub repo](https://github.com/isovalent/ebpf-docs) and open a PR with the fix. The maintainers
+there are friendly and contributions are welcomed.
 
 ## bpftool
 
