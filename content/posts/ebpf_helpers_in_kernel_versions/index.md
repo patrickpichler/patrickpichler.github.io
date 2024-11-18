@@ -20,7 +20,7 @@ It was started by [Dylan Reimerink](https://github.com/dylandreimerink) (as far 
 
 {{< img "ebpf_docs.png" "eBPF docs landing page" >}}
 
-Not only does it contain documentation for most eBPF helpers,program types and
+Not only does it contain documentation for most eBPF helpers, program types and
 maps, but also includes a kernel version it was introduced in. Take for example
 the `bpf_sk_storage_get` helper. The documentation for it can be found under
 [linux/helper-function/bpf_spin_lock/](https://docs.ebpf.io/linux/helper-function/bpf_sk_storage_get/).
